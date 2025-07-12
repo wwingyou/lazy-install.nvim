@@ -1,0 +1,5 @@
+lazy-install-about	lazy-install.txt	/*lazy-install-about*
+lazy-install-contents	lazy-install.txt	/*lazy-install-contents*
+lazy-install-installation	lazy-install.txt	/*lazy-install-installation*
+lazy-install-usage	lazy-install.txt	/*lazy-install-usage*
+lazy-install.txt	lazy-install.txt	/*lazy-install.txt*

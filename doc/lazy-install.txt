@@ -1,0 +1,51 @@
+*lazy-install.txt* For lazy-install.nvim plugin
+
+==============================================================================
+1. Contents                                     *lazy-install-contents*
+
+  1. About                      |lazy-install-about|
+  2. Installation               |lazy-install-installation|
+  3. Usage                      |lazy-install-usage|
+
+==============================================================================
+2. About                                        *lazy-install-about*
+
+lazy-install.nvim is a Neovim plugin that simplifies the process of adding new
+plugins to your configuration when using the lazy.nvim plugin manager.
+
+It provides a |:LazyInstall| command that accepts a GitHub URL. The plugin
+intelligently fetches the remote plugin's README file, finds the recommended
+installation code snippet for lazy.nvim, and automatically creates the
+corresponding plugin configuration file in your local Neovim setup.
+
+==============================================================================
+3. Installation                               *lazy-install-installation*
+
+To install lazy-install.nvim, add the following to your lazy.nvim
+configuration:
+
+>lua
+    {
+      "dogchew/lazy-install.nvim",
+      opts = {}
+    }
+<
+
+==============================================================================
+4. Usage                                          *lazy-install-usage*
+
+To install a new plugin, use the |:LazyInstall| command followed by the
+GitHub URL of the target plugin.
+
+Example:
+>vim
+    :LazyInstall https://github.com/folke/tokyonight.nvim
+<
+This command will create a new file, such as
+`~/.config/nvim/lua/plugins/tokyonight.lua`, pre-filled with the correct
+installation code.
+
+After the file is created, restart Neovim. lazy.nvim will automatically
+detect and install the new plugin.
+
+ vim:tw=78:ts=8:noet:ft=help:norl:
