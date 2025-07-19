@@ -1,10 +1,12 @@
 local M = {}
 
+local utils = require"lazy-install.utils"
+
 function M.install(url)
-  print("Installing from " .. url)
+  vim.notify("Installing from " .. url, vim.log.levels.INFO)
   local owner, repo = url:match("github.com/([^/]+)/([^/]+)")
   if not owner or not repo then
-    print("Invalid GitHub URL")
+    vim.notify("Invalid GitHub URL", vim.log.levels.ERROR)
     return
   end
 
@@ -27,13 +29,25 @@ function M.install(url)
   local install_example = nil
   for code_block in readme_content:gmatch("```lua\n(.-)```") do
     -- Wrap the code block in a return statement to make it a valid Lua expression
-    local func, err = load("return " .. code_block, "=", "t", {})
+    if not utils.start_with_return(code_block) then
+      code_block = "return " .. code_block
+    end
+
+    local func, err = load(code_block, "=", "t", {})
     if func then
       -- Execute the code in a sandboxed environment
       local ok, result = pcall(func)
+
       -- Check if the result is a table and the first element is the plugin name
-      if ok and type(result) == "table" and result[1] == owner .. "/" .. repo then
-        install_example = code_block
+      local t, level = utils.find_plugin_table(result, owner .. "/" ..repo)
+
+      -- Use raw string if possible
+      if t then
+        if level == 1 then
+          install_example = code_block
+        else
+          install_example = vim.inspect(t)
+        end
         break
       end
     end
@@ -44,17 +58,20 @@ function M.install(url)
   if file then
     file:write("-- " .. url .. "\n")
     if install_example then
-        if not install_example:match("^%s*return") then
-            file:write("return ")
-        end
+      if not utils.start_with_return(install_example) then
+        file:write("return ")
+      end
       file:write(install_example)
     else
       file:write(string.format("return { '%s/%s' }", owner, repo))
+      vim.notify("Example installation is not found on README. Please check repository.", vim.log.levels.INFO)
     end
     file:close()
-    print("Created " .. file_path)
+
+    vim.notify("Created " .. file_path, vim.log.levels.INFO)
+    vim.cmd.edit(file_path)
   else
-    print("Error creating file: " .. file_path)
+    vim.notify("Error creating file: " .. file_path, vim.log.levels.ERROR)
   end
 end
 
